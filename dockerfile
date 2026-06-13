@@ -1,3 +1,15 @@
+FROM node:22-alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY src ./src
+COPY tsconfig.json ./
+
+RUN npm run build
+
 FROM node:22-alpine
 
 WORKDIR /app
@@ -5,7 +17,6 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
 
-COPY index.js ./
-COPY .env ./
+COPY --from=builder /app/dist ./dist
 
-CMD ["node", "index.js"]
+CMD ["node", "dist/index.js"]
