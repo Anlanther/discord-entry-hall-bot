@@ -28,7 +28,7 @@ const EXCLUDED_USERS = ["anlanther"];
 // Terms: woman, she, her, they, them
 const TERMS_REGEX = /\b(woman|she|her|they|them)\b/i;
 
-// Social media detection (no ".com" required).
+// Social media detection.
 // Matches platform names/keywords and/or common social link/handle patterns.
 const SOCIAL_REGEX =
   /(\b(?:twitter|x|insta|instagram|facebook|tiktok|youtube|reddit|snapchat|linkedin|pinterest|threads|discord)\b[\w-]*)(?::\/\/)?[\w.-]*|@[\w.-]{2,}/i;
@@ -171,6 +171,7 @@ client.on("interactionCreate", async (interaction) => {
     let deletedCount = 0;
     const processedUsers = [];
     const failedUsers = [];
+    const CELEBRATION_CHANNEL_ID = "781081709029752873";
 
     for (const msg of messages.values()) {
       if (msg.author.bot) continue;
@@ -190,7 +191,11 @@ client.on("interactionCreate", async (interaction) => {
         let reason = [];
         if (!termsMatch) reason.push("missing terms (she/her, woman)");
         if (!socialMatch) reason.push("missing social media");
-        failedUsers.push(`${msg.author.username} - ${reason.join(", ")}`);
+        failedUsers.push({
+          username: msg.author.username,
+          reason: reason.join(", "),
+          originalMessage: msg.content.substring(0, 100),
+        });
 
         // Delete message
         try {
@@ -211,9 +216,11 @@ client.on("interactionCreate", async (interaction) => {
           (Date.now() - msg.author.createdAt.getTime()) / (24 * 60 * 60 * 1000),
         );
         console.log(`  ⏰ Account too young (${accountAgeDays} days old)`);
-        failedUsers.push(
-          `${msg.author.username} - account too young (${accountAgeDays} days old)`,
-        );
+        failedUsers.push({
+          username: msg.author.username,
+          reason: `account too young (${accountAgeDays} days old)`,
+          originalMessage: msg.content.substring(0, 100),
+        });
 
         // Delete message
         try {
@@ -235,7 +242,11 @@ client.on("interactionCreate", async (interaction) => {
           .catch(() => null));
       if (!member) {
         console.log(`  Could not fetch member for ${msg.author.tag}`);
-        failedUsers.push(`${msg.author.username} - could not fetch member`);
+        failedUsers.push({
+          username: msg.author.username,
+          reason: "could not fetch member",
+          originalMessage: msg.content.substring(0, 100),
+        });
         continue;
       }
 
@@ -244,7 +255,10 @@ client.on("interactionCreate", async (interaction) => {
         await member.roles.add(VERIFIED_ROLE_ID);
         await member.roles.remove(UNVERIFIED_ROLE_ID);
         processed++;
-        processedUsers.push(`${msg.author.username}`);
+        processedUsers.push({
+          id: msg.author.id,
+          username: msg.author.username,
+        });
 
         // Delete message after successful role update
         try {
@@ -261,18 +275,22 @@ client.on("interactionCreate", async (interaction) => {
           `  Error updating roles for ${msg.author.tag}:`,
           error.message,
         );
-        failedUsers.push(`${msg.author.username} - role update error`);
+        failedUsers.push({
+          username: msg.author.username,
+          reason: "role update error",
+          originalMessage: msg.content.substring(0, 100),
+        });
       }
     }
 
     const passedList =
       processedUsers.length > 0
-        ? `✅ **Passed (${processedUsers.length}):**\n${processedUsers.map((u) => `• ${u}`).join("\n")}`
+        ? `✅ **Passed (${processedUsers.length}):**\n${processedUsers.map((u) => `• ${u.username}`).join("\n")}`
         : `✅ **Passed:** None`;
 
     const failedList =
       failedUsers.length > 0
-        ? `❌ **Failed (${failedUsers.length}):**\n${failedUsers.map((u) => `• ${u}`).join("\n")}`
+        ? `❌ **Failed (${failedUsers.length}):**\n${failedUsers.map((u) => `• ${u.username} - ${u.reason}\n  Original message: "${u.originalMessage}..."`).join("\n")}`
         : `❌ **Failed:** None`;
 
     console.log(
@@ -295,6 +313,30 @@ client.on("interactionCreate", async (interaction) => {
       await interaction.followUp(failedList.substring(0, 1997) + "...");
     } else {
       await interaction.followUp(failedList);
+    }
+
+    // Send congratulations message in celebration channel for passed users
+    if (processedUsers.length > 0) {
+      try {
+        const celebrationChannel = await client.channels.fetch(
+          CELEBRATION_CHANNEL_ID,
+        );
+        const userMentions = processedUsers.map((u) => `<@${u.id}>`).join(", ");
+        const isPlural = processedUsers.length > 1;
+        const message = isPlural
+          ? `Hi ${userMentions}! Feel free to tell us more about yourselves in <#${MONITOR_CHANNEL_ID}> ☺️`
+          : `Hi ${userMentions}! Feel free to tell us more about yourself in <#${MONITOR_CHANNEL_ID}> 👋`;
+
+        await celebrationChannel.send(message);
+        console.log(
+          `✉️ Sent congratulations message to ${processedUsers.length} user(s)`,
+        );
+      } catch (error) {
+        console.error(
+          "❌ Failed to send congratulations message:",
+          error.message,
+        );
+      }
     }
   } catch (error) {
     console.error("🚨 Scan error:", error);
