@@ -33,11 +33,10 @@ export function checkMessageRequirements(
 }
 
 export function getFailureReason(content: string, author: User): string {
-  const {
-    termsMatch,
-    sourceMatch: sourceMatch,
-    isOldEnough,
-  } = checkMessageRequirements(content, author);
+  const { termsMatch, sourceMatch, isOldEnough } = checkMessageRequirements(
+    content,
+    author,
+  );
   const reasons: string[] = [];
 
   if (!termsMatch) reasons.push("missing terms (she/her, woman)");
@@ -48,6 +47,8 @@ export function getFailureReason(content: string, author: User): string {
     );
     reasons.push(`account too young (${days} days old)`);
   }
+  if (content.split("\n").length < 4)
+    reasons.push("message too short (less than 4 lines)");
 
   return reasons.join(", ");
 }

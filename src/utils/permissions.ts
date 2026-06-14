@@ -11,3 +11,9 @@ export function canManageRoles(member: GuildMember): boolean {
   const me = member.guild.members.me;
   return me.permissions.has(PermissionsBitField.Flags.ManageRoles);
 }
+
+export function canKickMembers(member: GuildMember): boolean {
+  if (!member.guild.members.me) return false;
+  const me = member.guild.members.me;
+  return me.permissions.has(PermissionsBitField.Flags.KickMembers);
+}

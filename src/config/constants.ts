@@ -42,6 +42,7 @@ export const CHANNELS = {
   CELEBRATION: getEnvVariable("CELEBRATION_CHANNEL_ID"),
   BOT: getEnvVariable("BOT_CHANNEL_ID"),
   INTRODUCTIONS: getEnvVariable("INTRODUCTIONS_CHANNEL_ID"),
+  CHAT: getEnvVariable("CHAT_CHANNEL_ID"),
 } as const;
 
 // Excluded users list
@@ -54,6 +55,11 @@ const ACCOUNT_AGE_REQUIREMENT_DAYS = getEnvNumber(
 );
 export const ACCOUNT_AGE_REQUIREMENT_MS: number =
   ACCOUNT_AGE_REQUIREMENT_DAYS * 24 * 60 * 60 * 1000;
+
+// Prune period
+const UNVERIFIED_PRUNE_DAYS = getEnvNumber("UNVERIFIED_PRUNE_DAYS", 2);
+export const UNVERIFIED_PRUNE_PERIOD_MS: number =
+  UNVERIFIED_PRUNE_DAYS * 24 * 60 * 60 * 1000;
 
 // Export types
 export type RoleId = (typeof ROLES)[keyof typeof ROLES];

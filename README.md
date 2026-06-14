@@ -72,6 +72,47 @@ I'm a 25 year old woman from Texas, follow me on instagram @johndoe
 hello i like pizza
 ```
 
+### `/prune`
+
+**Description**: Kicks unverified members who have been in the server longer than 48 hours.
+
+**Usage**: `/prune`
+
+**What it does**:
+
+1. Fetches all members in the server to ensure up-to-date data
+2. Identifies members with the UNVERIFIED role
+3. Checks each member's join date against the 48-hour threshold
+4. Kicks all members who:
+   - Have the UNVERIFIED role
+   - Joined more than 48 hours ago
+5. Sends a summary to the command user with:
+   - Total members found
+   - Successfully kicked count
+   - Any errors encountered
+
+**Output Example**:
+
+```
+✅ Pruned 5/5 unverified members.
+```
+
+Error Examples:
+
+```
+❌ Prune failed: I need Kick Members permission.
+```
+
+```
+No unverified members found who joined over 48 hours ago.
+```
+
+**Important Notes**:
+
+- Bot requires Kick Members permission
+- Includes a 1-second delay between kicks to avoid rate limiting
+- Kicked users receive a DM with the kick reason (if DMs are enabled)
+
 ## Events
 
 ### `ready`
@@ -139,6 +180,14 @@ hello i like pizza
 | -------- | -------------------------------- | ----------------------- |
 | **Pass** | `Hi @user(s)...` (batch welcome) | Summary + detailed list |
 | **Fail** | Nothing                          | Summary + detailed list |
+
+### Prune (`/prune` command)
+
+| Scenario       | Command Reply                                             |
+| -------------- | --------------------------------------------------------- |
+| **Success**    | ✅ Pruned X/Y unverified members.                         |
+| **No members** | No unverified members found who joined over 48 hours ago. |
+| **Error**      | ❌ Prune failed: [error message]                          |
 
 ## Automatic Registration
 

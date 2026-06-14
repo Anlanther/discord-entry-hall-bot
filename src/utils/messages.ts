@@ -11,13 +11,13 @@ export const messages = {
 
   // For celebration channel (public welcome)
   getSuccessMessage: (userId: string): string =>
-    `Hi <@${userId}>! Feel free to tell us more about yourself in <#${CHANNELS.INTRODUCTIONS}> 👋`,
+    `Hi <@${userId}>! Feel free to tell us more about yourself in <#${CHANNELS.INTRODUCTIONS}> 👋 or if you just want to chat head on to <#${CHANNELS.CHAT}>`,
 
   // For batch command reply
   getBatchSuccessMessage: (userMentions: string[]): string =>
     userMentions.length === 1
-      ? `Hi ${userMentions[0]}! Feel free to tell us more about yourself in <#${CHANNELS.INTRODUCTIONS}> 👋`
-      : `Hi ${userMentions.join(", ")}! Feel free to tell us more about yourselves in <#${CHANNELS.INTRODUCTIONS}> ☺️`,
+      ? `Hi ${userMentions[0]}! Feel free to tell us more about yourself in <#${CHANNELS.INTRODUCTIONS}> 👋 or if you just want to chat head on to <#${CHANNELS.CHAT}>`
+      : `Hi ${userMentions.join(", ")}! Feel free to tell us more about yourselves in <#${CHANNELS.INTRODUCTIONS}> ☺️ or if you just want to chat head on to <#${CHANNELS.CHAT}>`,
 
   // For command reply summaries
   getPassSummary: (processedUsers: ProcessedUser[]): string =>
@@ -34,6 +34,14 @@ export const messages = {
           `- **${u.username}** (${u.reason})\n  ${transformMessage(u.originalMessage)}`,
       )
       .join("\n")}`,
+
+  pruneNoMembers: (roleName: string) =>
+    `No members found with "${roleName}" who joined over 48 hours ago.`,
+
+  pruneSuccess: (kicked: number, total: number, roleName: string) =>
+    `✅ Pruned ${kicked}/${total} members with role ${roleName}`,
+
+  pruneError: (error: string) => `❌ Prune failed: ${error}`,
 };
 
 function transformMessage(message: string): string {
