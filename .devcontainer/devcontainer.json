@@ -1,0 +1,18 @@
+{
+  "name": "Discord Bot Entry",
+  "dockerComposeFile": [
+    "../../dotfiles/.devcontainer/docker-compose.base.yml",
+    "docker-compose.yml"
+  ],
+  "service": "app",
+  "workspaceFolder": "/workspaces/discord-bot-entry",
+  "postCreateCommand": "/usr/local/bin/detect-and-setup.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint"],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      }
+    }
+  }
+}

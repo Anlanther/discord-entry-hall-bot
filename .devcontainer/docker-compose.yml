@@ -1,0 +1,14 @@
+services:
+  app:
+    extends:
+      file: ../../dotfiles/.devcontainer/docker-compose.base.yml
+      service: base
+    working_dir: /workspaces/discord-bot-entry
+    volumes:
+      - ../..:/workspaces:cached
+      - node_modules:/workspaces/discord-bot-entry/node_modules
+    environment:
+      - NODE_ENV=development
+
+volumes:
+  node_modules:
