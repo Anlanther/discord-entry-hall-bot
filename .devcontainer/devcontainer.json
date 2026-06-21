@@ -1,18 +1,30 @@
 {
-  "name": "Discord Bot Entry",
-  "dockerComposeFile": [
-    "../../dotfiles/.devcontainer/docker-compose.base.yml",
-    "docker-compose.yml"
-  ],
-  "service": "app",
-  "workspaceFolder": "/workspaces/discord-bot-entry",
-  "postCreateCommand": "/usr/local/bin/detect-and-setup.sh",
+  "name": "discord-entry-hall-bot",
+  "build": {
+    "dockerfile": "Dockerfile",
+  },
   "customizations": {
     "vscode": {
-      "extensions": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint"],
-      "settings": {
-        "terminal.integrated.defaultProfile.linux": "zsh"
-      }
-    }
-  }
+      "extensions": [
+        "ms-vscode.vscode-typescript-next",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-vscode.vscode-eslint",
+      ],
+    },
+  },
+  "forwardPorts": [
+    // Add any ports your app uses, e.g., 3000 for Express, 8080 for http-server
+  ],
+  "postCreateCommand": "npm install",
+  "remoteUser": "node",
+  "updateRemoteUserUID": false,
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "typescript.tsdk": "node_modules/typescript/lib",
+  },
+  "mounts": [
+    "source=${localWorkspaceFolder}/../dotfiles,target=/home/node/dotfiles,type=bind",
+  ],
+  "postStartCommand": "ln -sf /home/node/dotfiles/.zshrc /home/node/.zshrc && ln -sf /home/node/dotfiles/.gitconfig /home/node/.gitconfig",
 }
