@@ -122,7 +122,7 @@ No unverified members found who joined over 48 hours ago.
 **What it does**:
 
 - Logs that the bot has successfully logged in
-- Registers the `/scan` slash command with Discord globally
+- Registers all slash commands with Discord globally automatically
 - Confirms command registration in console
 
 **Why it's needed**: Discord requires slash commands to be registered via API before they can be used. This event ensures the command is available when the bot is running.
